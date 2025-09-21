@@ -29,6 +29,12 @@ var (
 	Parede     = Elemento{'▤', CorParede, CorFundoParede, true}
 	Vegetacao  = Elemento{'♣', CorVerde, CorPadrao, false}
 	Vazio      = Elemento{' ', CorPadrao, CorPadrao, false}
+	Pontinho = Elemento{'•', CorAmarelo, CorPadrao, false}
+)
+
+// Canais e outras variáveis de jogo
+var (
+    reaparecerPontinho = make(chan struct {x, y int})
 )
 
 // Cria e retorna uma nova instância do jogo
@@ -60,6 +66,8 @@ func jogoCarregarMapa(nome string, jogo *Jogo) error {
 				e = Inimigo
 			case Vegetacao.simbolo:
 				e = Vegetacao
+			case Pontinho.simbolo:
+    			e = Pontinho
 			case Personagem.simbolo:
 				jogo.PosX, jogo.PosY = x, y // registra a posição inicial do personagem
 			}
@@ -90,6 +98,7 @@ func jogoPodeMoverPara(jogo *Jogo, x, y int) bool {
 	if jogo.Mapa[y][x].tangivel {
 		return false
 	}
+	
 
 	// Pode mover para a posição
 	return true

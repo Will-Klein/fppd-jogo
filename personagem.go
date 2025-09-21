@@ -14,6 +14,11 @@ func personagemMover(tecla rune, jogo *Jogo) {
 	}
 
 	nx, ny := jogo.PosX+dx, jogo.PosY+dy
+	// Se o jogador pisar em um pontinho, remove e agenda reaparecimento
+	if jogo.Mapa[ny][nx].simbolo == Pontinho.simbolo {
+		jogo.Mapa[ny][nx] = Vazio
+		reaparecerPontinho <- struct{ x, y int }{nx, ny}
+}
 	// Verifica se o movimento é permitido e realiza a movimentação
 	if jogoPodeMoverPara(jogo, nx, ny) {
 		jogoMoverElemento(jogo, jogo.PosX, jogo.PosY, dx, dy)

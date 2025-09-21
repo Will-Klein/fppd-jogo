@@ -1,7 +1,9 @@
 // main.go - Loop principal do jogo
 package main
 
-import "os"
+import (
+	"os" 
+	"time");
 
 func main() {
 	// Inicializa a interface (termbox)
@@ -19,6 +21,18 @@ func main() {
 	if err := jogoCarregarMapa(mapaFile, &jogo); err != nil {
 		panic(err)
 	}
+
+	// Goroutine que escuta os pontinhos para reaparecer
+	go func() {
+		for {
+			ponto := <-reaparecerPontinho
+			go func(px, py int) {
+				<-time.After(6 * time.Second) // espera 6000ms
+				jogo.Mapa[py][px] = Pontinho
+				interfaceDesenharJogo(&jogo)
+			}(ponto.x, ponto.y)
+		}
+	}()
 
 	// Desenha o estado inicial do jogo
 	interfaceDesenharJogo(&jogo)
