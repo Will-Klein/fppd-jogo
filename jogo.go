@@ -1,4 +1,3 @@
-// jogo.go - Funções para manipular os elementos do jogo, como carregar o mapa e mover o personagem
 package main
 
 import (
@@ -107,18 +106,16 @@ func jogoPodeMoverPara(jogo *Jogo, x, y int) bool {
 
 // Move um elemento para a nova posição
 func jogoMoverElemento(jogo *Jogo, x, y, dx, dy int) {
-	nx, ny := x+dx, y+dy
-	elemento := jogo.Mapa[y][x]
+    nx, ny := x+dx, y+dy
 
-	// Só restaura o último visitado se não for pontinho
-	if !EhPontinho(jogo.UltimoVisitado) {
-		jogo.Mapa[y][x] = jogo.UltimoVisitado
-	} else {
-		jogo.Mapa[y][x] = Vazio
-	}
+    // restaura o que estava debaixo do personagem na célula de origem
+    jogo.Mapa[y][x] = jogo.UltimoVisitado
 
-	jogo.UltimoVisitado = elemento
-	jogo.Mapa[ny][nx] = elemento
+    // guarda o que existe na célula de destino (para restaurar quando ele sair de lá)
+    jogo.UltimoVisitado = jogo.Mapa[ny][nx]
+
+    // IMPORTANTE: não escreva nada na célula de destino.
+    // O personagem é desenhado pela interface, não fica no Mapa.
 }
 
 func jogoMoverFantasma(j *Jogo, dx, dy int) {
