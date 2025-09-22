@@ -32,6 +32,7 @@ var (
 	Vegetacao  = Elemento{'♣', CorVerde, CorPadrao, false}
 	Vazio      = Elemento{' ', CorPadrao, CorPadrao, false}
 	Pontinho   = Elemento{'•', CorAmarelo, CorPadrao, false}
+	Botao = Elemento{'B', CorAmarelo, CorPadrao, false}
 )
 
 // Cria e retorna uma nova instância do jogo
@@ -66,7 +67,9 @@ func jogoCarregarMapa(nome string, jogo *Jogo) error {
 			case Vegetacao.simbolo:
 				e = Vegetacao
 			case Pontinho.simbolo:   
-				e = Pontinho	
+				e = Pontinho
+			case Botao.simbolo:
+    			e = Botao	
 			case Personagem.simbolo:
 				jogo.PosX, jogo.PosY = x, y // registra a posição inicial do personagem
 			}

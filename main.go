@@ -4,35 +4,47 @@ package main
 import "os"
 
 // Processa eventos do teclado e é a ÚNICA que altera o estado e redesenha.
+// Processa eventos do teclado e é a ÚNICA que altera o estado e redesenha.
 func processadoraDeEventos(eventos <-chan EventoTeclado, movimentoFantasma <-chan MovimentoFantasma, jogo *Jogo) {
-	for {
-		select {
-		case ev, aberto := <-eventos:
-			if !aberto {
-				return
-			}
-			if continuar := personagemExecutarAcao(ev, jogo); !continuar {
-				return // ESC
-			}
-			interfaceDesenharJogo(jogo)
+    for {
+        select {
+        case ev, aberto := <-eventos:
+            if !aberto {
+                return
+            }
+            if continuar := personagemExecutarAcao(ev, jogo); !continuar {
+                return // ESC
+            }
+            interfaceDesenharJogo(jogo)
 
-		case mov := <-movimentoFantasma:
-			oldX, oldY := jogo.FantasmaX, jogo.FantasmaY
-			jogoMoverFantasma(jogo, mov.MX, mov.MY)
-			if jogo.FantasmaX != oldX || jogo.FantasmaY != oldY {
-				jogo.StatusMsg = "☠ moveu"
-			} else {
-				jogo.StatusMsg = "☠ tentou mover, mas bateu"
-			}
-			interfaceDesenharJogo(jogo)
+        case mov := <-movimentoFantasma:
+            oldX, oldY := jogo.FantasmaX, jogo.FantasmaY
+            jogoMoverFantasma(jogo, mov.MX, mov.MY)
+            if jogo.FantasmaX != oldX || jogo.FantasmaY != oldY {
+                jogo.StatusMsg = "☠ moveu"
+            } else {
+                jogo.StatusMsg = "☠ tentou mover, mas bateu"
+            }
+            interfaceDesenharJogo(jogo)
 
-		// >>> NOVO: reaparecimento de pontinhos controlado pela processadora
-		case p := <-pontinhosProntos:
-			jogo.Mapa[p.y][p.x] = Pontinho
-			jogo.StatusMsg = "• reapareceu"
-			interfaceDesenharJogo(jogo)
-		}
-	}
+        // reaparecimento de pontinhos controlado pela processadora
+        case p := <-pontinhosProntos:
+            jogo.Mapa[p.y][p.x] = Pontinho
+            jogo.StatusMsg = "• reapareceu"
+            interfaceDesenharJogo(jogo)
+
+        // ações da porta (true = abrir, false = fechar)
+        case abrir := <-portaAcoes:
+            if abrir {
+                jogo.Mapa[portaY][portaX] = Vazio
+                jogo.StatusMsg = "🚪 abriu"
+            } else {
+                jogo.Mapa[portaY][portaX] = Parede
+                jogo.StatusMsg = "🚪 fechou (timeout)"
+            }
+            interfaceDesenharJogo(jogo)
+        }
+    }
 }
 
 func main() {
@@ -52,7 +64,7 @@ func main() {
 		panic(err)
 	}
 
-	// >>> NOVO: inicia o pipeline dos pontinhos (agenda 6s e devolve em pontinhosProntos)
+	IniciarPorta()
 	IniciarPontinhos()
 
 	// Desenha o estado inicial do jogo

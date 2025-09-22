@@ -18,17 +18,20 @@ func personagemMover(tecla rune, jogo *Jogo) {
 
     nx, ny := jogo.PosX+dx, jogo.PosY+dy
 
-    // Verifica se o movimento é permitido
-    if jogoPodeMoverPara(jogo, nx, ny) {
-        // Coleta o pontinho ANTES de ocupar a célula
-        if EhPontinho(jogo.Mapa[ny][nx]) {
-            ColetarPontinho(jogo, nx, ny) // remove e agenda reaparecimento via canal
-        }
+	if jogoPodeMoverPara(jogo, nx, ny) {
+		// aciona botão se a célula de destino for 'B'
+		if jogo.Mapa[ny][nx].simbolo == Botao.simbolo {
+			botaoPress <- struct{}{}
+		}
 
-        // Realiza o movimento
-        jogoMoverElemento(jogo, jogo.PosX, jogo.PosY, dx, dy)
-        jogo.PosX, jogo.PosY = nx, ny
-    }
+		// coleta pontinho antes de mover (como já está)
+		if EhPontinho(jogo.Mapa[ny][nx]) {
+			ColetarPontinho(jogo, nx, ny)
+		}
+
+		jogoMoverElemento(jogo, jogo.PosX, jogo.PosY, dx, dy)
+		jogo.PosX, jogo.PosY = nx, ny
+	}
 }
 
 // Define o que ocorre quando o jogador pressiona a tecla de interação
