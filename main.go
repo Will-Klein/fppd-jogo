@@ -37,10 +37,10 @@ func processadoraDeEventos(eventos <-chan EventoTeclado, movimentoFantasma <-cha
         case abrir := <-portaAcoes:
             if abrir {
                 jogo.Mapa[portaY][portaX] = Vazio
-                jogo.StatusMsg = "🚪 abriu"
+                jogo.StatusMsg = "porta abriu"
             } else {
                 jogo.Mapa[portaY][portaX] = Parede
-                jogo.StatusMsg = "🚪 fechou (timeout)"
+                jogo.StatusMsg = "porta fechou (timeout)"
             }
             interfaceDesenharJogo(jogo)
         }
