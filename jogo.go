@@ -31,6 +31,7 @@ var (
 	Parede     = Elemento{'▤', CorParede, CorFundoParede, true}
 	Vegetacao  = Elemento{'♣', CorVerde, CorPadrao, false}
 	Vazio      = Elemento{' ', CorPadrao, CorPadrao, false}
+	Pontinho   = Elemento{'•', CorAmarelo, CorPadrao, false}
 )
 
 // Cria e retorna uma nova instância do jogo
@@ -64,6 +65,8 @@ func jogoCarregarMapa(nome string, jogo *Jogo) error {
 				jogo.UltimoVisitadoFantasma = Vazio // inicializa o último visitado do fantasma como elemento Vazio
 			case Vegetacao.simbolo:
 				e = Vegetacao
+			case Pontinho.simbolo:   
+				e = Pontinho	
 			case Personagem.simbolo:
 				jogo.PosX, jogo.PosY = x, y // registra a posição inicial do personagem
 			}
@@ -102,13 +105,17 @@ func jogoPodeMoverPara(jogo *Jogo, x, y int) bool {
 // Move um elemento para a nova posição
 func jogoMoverElemento(jogo *Jogo, x, y, dx, dy int) {
 	nx, ny := x+dx, y+dy
+	elemento := jogo.Mapa[y][x]
 
-	// Obtem elemento atual na posição
-	elemento := jogo.Mapa[y][x] // guarda o conteúdo atual da posição
+	// Só restaura o último visitado se não for pontinho
+	if !EhPontinho(jogo.UltimoVisitado) {
+		jogo.Mapa[y][x] = jogo.UltimoVisitado
+	} else {
+		jogo.Mapa[y][x] = Vazio
+	}
 
-	jogo.Mapa[y][x] = jogo.UltimoVisitado     // restaura o conteúdo anterior
-	jogo.UltimoVisitado = jogo.Mapa[ny][nx]   // guarda o conteúdo atual da nova posição
-	jogo.Mapa[ny][nx] = elemento              // move o elemento
+	jogo.UltimoVisitado = elemento
+	jogo.Mapa[ny][nx] = elemento
 }
 
 func jogoMoverFantasma(j *Jogo, dx, dy int) {
