@@ -17,7 +17,13 @@ func processadoraDeEventos(eventos <-chan EventoTeclado, movimentoFantasma <-cha
 			interfaceDesenharJogo(jogo)
 
 		case mov := <-movimentoFantasma:
+			oldX, oldY := jogo.FantasmaX, jogo.FantasmaY 			//teste
 			jogoMoverFantasma(jogo, mov.MX, mov.MY)
+			if jogo.FantasmaX != oldX || jogo.FantasmaY != oldY {   //teste
+				jogo.StatusMsg = "☠ moveu"
+			} else { 												//teste
+				jogo.StatusMsg = "☠ tentou mover, mas bateu"
+			}
 			interfaceDesenharJogo(jogo)
 		}
 	}

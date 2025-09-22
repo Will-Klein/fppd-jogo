@@ -61,6 +61,7 @@ func jogoCarregarMapa(nome string, jogo *Jogo) error {
 			case Inimigo.simbolo:
 				e = Inimigo
 				jogo.FantasmaX, jogo.FantasmaY = x, y // registra a posição inicial do fantasma
+				jogo.UltimoVisitadoFantasma = Vazio // inicializa o último visitado do fantasma como elemento Vazio
 			case Vegetacao.simbolo:
 				e = Vegetacao
 			case Personagem.simbolo:
@@ -117,12 +118,10 @@ func jogoMoverFantasma(j *Jogo, dx, dy int) {
         return
     }
 
-	if nx == j.PosX && ny == j.PosY {
-        j.StatusMsg = "☠ pegou você!"
+	// correção
+	if j.UltimoVisitadoFantasma.simbolo == 0 {
+        j.UltimoVisitadoFantasma = Vazio
     }
-
-    // elemento atual do fantasma (☠) na matriz
-    elemFantasma := j.Mapa[fromY][fromX]
 
     // repõe o que estava debaixo do fantasma na célula que ele está saindo
     j.Mapa[fromY][fromX] = j.UltimoVisitadoFantasma
@@ -131,7 +130,7 @@ func jogoMoverFantasma(j *Jogo, dx, dy int) {
     j.UltimoVisitadoFantasma = j.Mapa[ny][nx]
 
     // coloca o fantasma na célula de destino
-    j.Mapa[ny][nx] = elemFantasma
+    j.Mapa[ny][nx] = Inimigo
 
     // atualiza coordenadas
     j.FantasmaX, j.FantasmaY = nx, ny
