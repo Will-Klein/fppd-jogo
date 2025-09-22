@@ -18,6 +18,8 @@ type Elemento struct {
 type Jogo struct {
 	Mapa            [][]Elemento // grade 2D representando o mapa
 	PosX, PosY      int          // posição atual do personagem
+	FantasmaX, FantasmaY  int          // posição atual do fantasma
+	UltimoVisitadoFantasma Elemento // elemento que estava na posição do fantasma antes de mover
 	UltimoVisitado  Elemento     // elemento que estava na posição do personagem antes de mover
 	StatusMsg       string       // mensagem para a barra de status
 }
@@ -58,6 +60,7 @@ func jogoCarregarMapa(nome string, jogo *Jogo) error {
 				e = Parede
 			case Inimigo.simbolo:
 				e = Inimigo
+				jogo.FantasmaX, jogo.FantasmaY = x, y // registra a posição inicial do fantasma
 			case Vegetacao.simbolo:
 				e = Vegetacao
 			case Personagem.simbolo:
@@ -106,3 +109,31 @@ func jogoMoverElemento(jogo *Jogo, x, y, dx, dy int) {
 	jogo.UltimoVisitado = jogo.Mapa[ny][nx]   // guarda o conteúdo atual da nova posição
 	jogo.Mapa[ny][nx] = elemento              // move o elemento
 }
+
+func jogoMoverFantasma(j *Jogo, dx, dy int) {
+    fromX, fromY := j.FantasmaX, j.FantasmaY
+    nx, ny := fromX+dx, fromY+dy
+    if !jogoPodeMoverPara(j, nx, ny) {
+        return
+    }
+
+	if nx == j.PosX && ny == j.PosY {
+        j.StatusMsg = "☠ pegou você!"
+    }
+
+    // elemento atual do fantasma (☠) na matriz
+    elemFantasma := j.Mapa[fromY][fromX]
+
+    // repõe o que estava debaixo do fantasma na célula que ele está saindo
+    j.Mapa[fromY][fromX] = j.UltimoVisitadoFantasma
+
+    // guarda o que existe no destino (para repor quando sair de lá depois)
+    j.UltimoVisitadoFantasma = j.Mapa[ny][nx]
+
+    // coloca o fantasma na célula de destino
+    j.Mapa[ny][nx] = elemFantasma
+
+    // atualiza coordenadas
+    j.FantasmaX, j.FantasmaY = nx, ny
+}
+
